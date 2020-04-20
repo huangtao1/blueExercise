@@ -23,3 +23,17 @@ def contact(request):
     联系页
     """
     return render(request, 'home_application/contact.html')
+
+
+def task_record(request):
+    """
+    任务记录
+    """
+    return render(request, 'home_application/task_record.html')
+
+
+def task_execute(request):
+    """
+    执行任务
+    """
+    return render(request, 'home_application/task_execute.html')
