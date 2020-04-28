@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
+from .models import ScriptTemplates
 
 
 # 开发框架中通过中间件默认是需要登录态的，如有不需要登录的，可添加装饰器login_exempt
@@ -36,4 +37,6 @@ def task_execute(request):
     """
     执行任务
     """
-    return render(request, 'home_application/task_execute.html')
+    tasks = ScriptTemplates.objects.all()
+    data = {"tasks": tasks}
+    return render(request, 'home_application/task_execute.html', data)
