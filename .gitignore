@@ -1,5 +1,4 @@
 .idea
 venv/
-migrations/
 *.pyc
 __pycache__/
