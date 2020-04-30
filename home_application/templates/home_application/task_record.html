@@ -5,7 +5,8 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>{{ APP_CODE }}</title>
+    <link rel="icon" href="{{ STATIC_URL }}open/favicon.ico" type="image/x-icon">
     <!-- 若您需要使用Kendo UI Professional，请联系版权人获得合法的授权或许可。 -->
     <!-- Bootstrap css -->
     <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/css/bootstrap.min.css"
@@ -66,7 +67,7 @@
                                 <a href="javascript:;">
                                     <img class="img-rounded"
                                          src="https://magicbox.bk.tencent.com/static_api/v3/components/horizontal_nav1/images/avatar.png">
-                                    <span>admin</span>
+                                    <span>{{ request.user.username }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -81,7 +82,10 @@
                 <label class="col-sm-3 control-label bk-lh30 pt0">业务：</label>
                 <div class="col-sm-9">
                     <select name="" id="" class="form-control bk-valign-top">
-                        <option value="业务1">业务1</option>
+                        <option></option>
+                        {% for service in services %}
+                            <option value="{{ service.bk_biz_id }}">{{ service.bk_biz_name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -89,7 +93,10 @@
                 <label class="col-sm-3 control-label bk-lh30 pt0">用户：</label>
                 <div class="col-sm-9">
                     <select name="" id="" class="form-control bk-valign-top">
-                        <option value="用户1">用户1</option>
+                        <option></option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -97,12 +104,15 @@
                 <label class="col-sm-3 control-label bk-lh30 pt0">任务：</label>
                 <div class="col-sm-9">
                     <select name="" id="" class="form-control bk-valign-top">
-                        <option value="任务1">任务1</option>
+                        <option></option>
+                        {% for task_record in task_records %}
+                            <option value="{{ task_record.task_id }}">{{ task_record.task_id }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
             <div class="form-group clearfix ">
-                <label class="col-sm-3 control-label bk-lh30 pt0">任务：</label>
+                <label class="col-sm-3 control-label bk-lh30 pt0">操作时间：</label>
                 <div class="col-sm-9">
                     <input type="text" class="form-control daterangepicker_demo" id="daterangepicker_demo2"
                            placeholder="选择日期...">
@@ -114,7 +124,7 @@
                     <button type="button" class="king-btn king-default ">取消</button>
                 </div>
             </div>
-            <table class="table mb0 pr15 ranger-box ">
+            <table class="table mb0 pr15 ranger-box " id="task-record">
                 <thead>
                 <tr>
                     <th>业务</th>
@@ -128,55 +138,31 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>业务1</td>
-                    <td>admin</td>
-                    <td>task1</td>
-                    <td>2020-04-20</td>
-                    <td>1</td>
-                    <td>进行中</td>
-                    <td>a=2</td>
-                    <td>okokok</td>
-                </tr>
-                <tr>
-                    <td>业务2</td>
-                    <td>admin</td>
-                    <td>task1</td>
-                    <td>2020-04-20</td>
-                    <td>2</td>
-                    <td>进行中</td>
-                    <td>a=3</td>
-                    <td>okokok</td>
-                </tr>
-                <tr>
-                    <td>业务3</td>
-                    <td>admin</td>
-                    <td>task3</td>
-                    <td>2020-04-20</td>
-                    <td>3</td>
-                    <td>进行中</td>
-                    <td>a=4</td>
-                    <td>okokok</td>
-                </tr>
                 </tbody>
             </table>
             <!-- 设置面板Start -->
-            <template id="header_tpl_1587375199971">
+            <template id="header_tpl_record">
                 <tr>
-                    <th style="width: 100px;">#index#</th>
-                    <th style="width: 20%;">#task#</th>
-                    <th style="width: 20%;">#progress#</th>
-                    <th style="width: 20%;">#host#</th>
-                    <th>#date#</th>
+                    <th style="width: 10%;">业务</th>
+                    <th style="width: 10%;">用户</th>
+                    <th style="width: 10%;">任务</th>
+                    <th style="width: 20%;">操作时间</th>
+                    <th style="width: 10%;">机器数</th>
+                    <th style="width: 10%;">状态</th>
+                    <th style="width: 10%;">参数</th>
+                    <th style="width: 10%;">详情</th>
                 </tr>
             </template>
-            <template id="tpl_1587375199971">
+            <template id="tpl_record">
                 <tr>
-                    <td style="width: 100px;">#index#</td>
-                    <td style="width: 20%;">#columnName1#</td>
-                    <td style="width: 20%;">#columnName2#</td>
-                    <td style="width: 20%;">#columnName3#</td>
-                    <td>#columnName4#</td>
+                    <td style="width: 10%;">#service_name#</td>
+                    <td style="width: 10%;">#username#</td>
+                    <td style="width: 10%;">#task_id#</td>
+                    <td style="width: 20%;">#execute_time#</td>
+                    <td style="width: 10%;">#machine_num#</td>
+                    <td style="width: 10%;">#state#</td>
+                    <td style="width: 10%;">#params#</td>
+                    <td style="width: 10%;">#result#</td>
                 </tr>
             </template>
             <!-- 设置面板End -->
@@ -190,6 +176,38 @@
             "format": 'YYYY/MM/DD'
         },
         autoApply: true
+    });
+    $(function () {
+        function renderTpl(str, cfg) {
+            var re = /(#(.+?)#)/g;
+
+            return str.replace(re, function () {
+                var val = cfg[arguments[2]] + '';
+                if (typeof val == 'undefined') {
+                    val = '';
+                }
+                return val;
+            });
+        }
+
+        // 异步请求后台数据
+        $.ajax({
+            url: '{{ SITE_URL }}task-record-history/',
+            type: 'POST',
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success: function (res) {
+                var _html = ' ';
+                var list = res.items;
+                var tpl = $('#tpl_record').html();
+                var headerTpl = $('#header_tpl_record').html();
+                for (var i = 0, len = list.length; i < len; i++) {
+                    var item = list[i];
+                    _html += renderTpl(tpl, item)
+                }
+                $('#task-record tbody').html(_html);
+                $('#task-record thead').html(renderTpl(headerTpl, res.catalogues));
+            }
+        });
     });
 </script>
 </body>

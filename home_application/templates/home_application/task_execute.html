@@ -5,7 +5,8 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>{{ APP_CODE }}</title>
+    <link rel="icon" href="{{ STATIC_URL }}open/favicon.ico" type="image/x-icon">
     <!-- 若您需要使用Kendo UI Professional，请联系版权人获得合法的授权或许可。 -->
     <!-- Bootstrap css -->
     <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/css/bootstrap.min.css"
@@ -20,6 +21,10 @@
     <!--蓝鲸提供的公用样式库 -->
     <link href="https://magicbox.bk.tencent.com/static_api/v3/bk/css/bk.css" rel="stylesheet">
     <link href="https://magicbox.bk.tencent.com/static_api/v3/bk/css/bk_pack.css" rel="stylesheet">
+    <!-- alert引入-->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/bk/css-pro/bk.css" rel="stylesheet">
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bk-icon-2.0/iconfont.css" rel="stylesheet">
+    <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/bkDialog-2.0/js/bkDialog.js"></script>
     <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
     <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/jquery-1.10.2.min.js"></script>
     <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
@@ -59,7 +64,7 @@
                                 <a href="javascript:;">
                                     <img class="img-rounded"
                                          src="https://magicbox.bk.tencent.com/static_api/v3/components/horizontal_nav1/images/avatar.png">
-                                    <span>admin</span>
+                                    <span>{{ request.user.username }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -85,7 +90,7 @@
             <div class="form-group clearfix ">
                 <label class="col-sm-3 control-label bk-lh30 pt0">选择脚本：</label>
                 <div class="col-sm-9">
-                    <select name="" id="" class="form-control bk-valign-top">
+                    <select name="script_id" id="script_id" class="form-control bk-valign-top">
                         <option></option>
                         {% for task in tasks %}
                             <option value="{{ task.id }}">{{ task.name }}</option>
@@ -95,12 +100,12 @@
             </div>
             <div class="form-group clearfix">
                 <div class="col-sm-9 col-sm-offset-3">
-                    <button type="button" class="king-btn mr10  king-success">执行</button>
+                    <button type="button" class="king-btn mr10  king-success" onclick="exec_script()">执行</button>
                     <button type="button" class="king-btn king-default ">取消</button>
                 </div>
             </div>
         </form>
-        <table class="table mb0 pr15 ranger-box2  ">
+        <table class="table mb0 pr15 ranger-box2" id="task-exec">
             <thead>
             <tr>
                 <th style="width: 25px"><input type="checkbox" name="checkall" value=""></th>
@@ -115,10 +120,10 @@
         </table>
         <template id="header_tpl_exec">
             <tr>
-                <th style="width: 5%"><input type="checkbox" name="checkall" value=""></th>
-                <th style="width: 5%;">序号</th>
-                <th style="width: 20%;">ip</th>
-                <th style="width: 20%;">操作系统</th>
+                <th style="width: 25px"><input type="checkbox" name="checkall" value=""></th>
+                <th style="width: 70px;">序号</th>
+                <th style="width: 30%;">IP</th>
+                <th style="width: 30%;">操作系统</th>
                 <th>操作</th>
             </tr>
         </template>
@@ -126,8 +131,8 @@
             <tr>
                 <td><input type="checkbox" value=""></td>
                 <td style="width: 70px;">#index#</td>
-                <td style="width: 15%;">#ip#</td>
-                <td style="width: 15%;">#os#</td>
+                <td style="width: 30%;">#ip#</td>
+                <td style="width: 30%;">#os#</td>
                 <td>
                     <button class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i></button>
                     <button class="btn btn-xs btn-warning"><i class="glyphicon glyphicon-edit"></i></button>
@@ -152,7 +157,8 @@
     }
 
     function getHost() {
-        $('.ranger-box2 tbody').html("");
+        $('#task-exec tbody').html("");
+        ip_list = [];
         var service_id = $("#service_select").val();
         // 异步请求后台数据
         $.ajax({
@@ -168,12 +174,82 @@
                     var item = list[i];
                     _html += renderTpl(tpl, item)
                 }
-                $('.ranger-box2 tbody').html(_html);
-                $('.ranger-box2 thead').html(renderTpl(headerTpl, res.catalogues));
+                $('#task-exec tbody').html(_html);
+                $('#task-execthead').html(renderTpl(headerTpl, res.catalogues));
             }
         });
     }
+
+    // 自定义移除从列表中移除value值
+    Array.prototype.removeByValue = function (val) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] === val) {
+                this.splice(i, 1);
+                break;
+            }
+        }
+    };
+    let ip_list = [];
+
+    $('.ranger-box2 tbody').on('change', 'input[type="checkbox"]', function () {
+        if ($(this).parent().attr('class') === 'checked') {
+            var tr = $(this).closest("tr");
+            var ip = tr.find("td:eq(2)").text();
+            ip_list.removeByValue(ip)
+            $(this).parent().removeClass("checked");
+        } else {
+            var tr = $(this).closest("tr");
+            var ip = tr.find("td:eq(2)").text();
+            ip_list.push(ip)
+            $(this).parent().addClass("checked");
+        }
+    })
+
+    function exec_script() {
+        if (ip_list.length === 0) {
+            alert("请选择执行ip!!!");
+        }
+        var service_id = $('#service_select').val();
+        var script_id = $('#script_id').val();
+        $.ajax(
+            {
+                url: '{{ SITE_URL }}task-exec-start/',
+                type: 'POST',
+                data: {
+                    service_id: service_id,
+                    script_id: script_id,
+                    ip_list: ip_list,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                traditional: true,
+                success: function (res) {
+                    if (res.message === "success") {
+
+                        var dialog = new bkDialog({
+                            type: 'success',
+                            statusOpts: {
+                                title: '任务下发成功!!',
+                                subTitle: ' '
+                            }
+                        });
+                        dialog.show();
+                    } else {
+                        var dialog = new bkDialog({
+                            type: 'success',
+                            icon: 'bk',
+                            statusOpts: {
+                                title: '任务下发失败,错误如下:',
+                                subTitle: res.message
+                            }
+                        });
+                        dialog.show();
+                    }
+                }
+            });
+    }
+
 </script>
+
 </body>
 
 </html>

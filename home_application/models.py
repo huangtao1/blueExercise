@@ -9,3 +9,15 @@ class ScriptTemplates(models.Model):
 
     def __repr__(self):
         return "script name:%s" % self.name
+
+
+class ScriptExecuteRecord(models.Model):
+    service_name = models.CharField(max_length=100, verbose_name="业务名称")
+    username = models.CharField(max_length=50, verbose_name="执行用户名")
+    task_id = models.CharField(max_length=100, verbose_name="执行任务的id")
+    execute_time = models.DateTimeField(verbose_name="开始执行的时间")
+    machine_num = models.IntegerField(verbose_name="执行的ip数")
+    machine_ip = models.TextField(verbose_name="执行的ip信息")
+    state = models.CharField(max_length=20,verbose_name="任务的状态")
+    params = models.TextField(verbose_name="执行的参数")
+    result = models.TextField(verbose_name="执行详情")
