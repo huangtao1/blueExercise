@@ -7,6 +7,7 @@ import config
 import json
 import base64
 from datetime import datetime
+from .celery_tasks import async_status
 
 
 # 开发框架中通过中间件默认是需要登录态的，如有不需要登录的，可添加装饰器login_exempt
@@ -136,8 +137,6 @@ def exec_script(request):
                       {"bk_cloud_id": 0, "ip": ip} for ip in ip_list]}
         task_result = client.job.fast_execute_script(kwargs)
         print(task_result)
-        if task_result['message'] != 'success':
-            return HttpResponse(json.dumps({"message": task_result['message']}), content_type='application/json')
         # 数据写入任务执行记录表
         # 业务名称
         service_args = {
@@ -167,16 +166,15 @@ def exec_script(request):
         machine_num = len(ip_list)
         # machine_ip
         machine_ip = json.dumps(ip_list)
-        state = "已下发"
         # params
         params = ""
-        # result
-        result = task_result['message']
         new_record_info = {"service_name": service_name, "username": username, "task_id": task_id,
                            "execute_time": execute_time,
                            "machine_num": machine_num,
-                           "machine_ip": machine_ip, "state": state, "params": params, "result": result}
-        ScriptExecuteRecord.objects.create(**new_record_info)
+                           "machine_ip": machine_ip, "params": params}
+        if task_result.get('result', False):
+            async_status(client=client, data=new_record_info, service_id=service_id)
+
         return HttpResponse(json.dumps({"message": task_result['message']}), content_type='application/json')
 
 
