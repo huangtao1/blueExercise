@@ -81,10 +81,10 @@
             <div class="form-group clearfix ">
                 <label class="col-sm-3 control-label bk-lh30 pt0">业务：</label>
                 <div class="col-sm-9">
-                    <select name="" id="" class="form-control bk-valign-top">
+                    <select name="biz_name" id="biz_name" class="form-control bk-valign-top">
                         <option></option>
                         {% for service in services %}
-                            <option value="{{ service.bk_biz_id }}">{{ service.bk_biz_name }}</option>
+                            <option value="{{ service.bk_biz_name }}">{{ service.bk_biz_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -92,7 +92,7 @@
             <div class="form-group clearfix ">
                 <label class="col-sm-3 control-label bk-lh30 pt0">用户：</label>
                 <div class="col-sm-9">
-                    <select name="" id="" class="form-control bk-valign-top">
+                    <select name="username" id="username" class="form-control bk-valign-top">
                         <option></option>
                         {% for user in users %}
                             <option value="{{ user.id }}">{{ user.username }}</option>
@@ -103,7 +103,7 @@
             <div class="form-group clearfix ">
                 <label class="col-sm-3 control-label bk-lh30 pt0">任务：</label>
                 <div class="col-sm-9">
-                    <select name="" id="" class="form-control bk-valign-top">
+                    <select name="task_name" id="task_name" class="form-control bk-valign-top">
                         <option></option>
                         {% for task in tasks %}
                             <option value="{{ task.id }}">{{ task.name }}</option>
@@ -208,6 +208,32 @@
                 $('#task-record thead').html(renderTpl(headerTpl, res.catalogues));
             }
         });
+    });
+    //根据选择查询
+    $('.king-success').click(function () {
+        $.ajax({
+            url: '{{ SITE_URL }}query-record-history/',
+            type: 'POST',
+            data: {
+                "biz_name": $('biz_name').val(),
+                "username": $('username').val(),
+                "task_name": $('task_name').val(),
+                "time": $('#daterangepicker_demo2').val(),
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (res) {
+                var _html = ' ';
+                var list = res.items;
+                var tpl = $('#tpl_record').html();
+                var headerTpl = $('#header_tpl_record').html();
+                for (var i = 0, len = list.length; i < len; i++) {
+                    var item = list[i];
+                    _html += renderTpl(tpl, item)
+                }
+                $('#task-record tbody').html(_html);
+                $('#task-record thead').html(renderTpl(headerTpl, res.catalogues));
+            }
+        })
     });
 </script>
 </body>

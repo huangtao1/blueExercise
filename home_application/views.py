@@ -59,7 +59,7 @@ def task_record(request):
     # 执行记录
     task_records = ScriptExecuteRecord.objects.all()
     tasks = ScriptTemplates.objects.all()
-    data = {'services': services, 'users': users, 'task_records': task_records,'tasks':tasks}
+    data = {'services': services, 'users': users, 'task_records': task_records, 'tasks': tasks}
     return render(request, 'home_application/task_record.html', data)
 
 
@@ -173,7 +173,8 @@ def exec_script(request):
         new_record_info = {"service_name": service_name, "username": username, "task_id": task_id,
                            "execute_time": execute_time,
                            "machine_num": machine_num,
-                           "machine_ip": machine_ip, "params": params, "script_id": script_id,"script_name":script_name}
+                           "machine_ip": machine_ip, "params": params, "script_id": script_id,
+                           "script_name": script_name}
         if task_result.get('result', False):
             async_status(client=client, data=new_record_info, service_id=service_id)
 
@@ -195,6 +196,28 @@ class TimeEncoder(json.JSONEncoder):
 def get_task_records(request):
     # 执行记录
     task_records = ScriptExecuteRecord.objects.all()
+    record_info = {
+        "items": [{"service_name": record.service_name, "username": record.username, "script_name": record.script_name,
+                   "execute_time": record.execute_time,
+                   "machine_num": record.machine_num,
+                   "machine_ip": record.machine_ip, "state": record.state, "params": record.params,
+                   "result": record.result} for record in task_records]}
+    return HttpResponse(json.dumps(record_info, cls=TimeEncoder), content_type='application/json')
+
+
+def query_task_records(request):
+    # 执行记录
+    biz_name = request.POST.get("biz_name")
+    username = request.POST.get("username")
+    script_name = request.POST.get("task_name")
+    starttime, endtime = request.POST.get("time").split("-")
+    starttime = starttime.strip().replace("/", "-") + '00:00:00'
+    endtime = endtime.strip().replace("/", "-") + '23:59:59'
+    start_time = datetime.strftime(starttime, '%Y-%m-%d %H:%M:%S')
+    end_time = datetime.strftime(endtime, '%Y-%m-%d %H:%M:%S')
+    task_records = ScriptExecuteRecord.objects.all()
+    task_records = task_records.filter(service_name=biz_name).filter(username=username).filter(script_name=script_name)
+    task_records = task_records.filter(create_time__range=(start_time, end_time))
     record_info = {
         "items": [{"service_name": record.service_name, "username": record.username, "script_name": record.script_name,
                    "execute_time": record.execute_time,
