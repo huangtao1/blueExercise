@@ -215,9 +215,9 @@
             url: '{{ SITE_URL }}query-record-history/',
             type: 'POST',
             data: {
-                "biz_name": $('biz_name').val(),
-                "username": $('username').val(),
-                "task_name": $('task_name').val(),
+                "biz_name": $('#biz_name').val(),
+                "username": $('#username').val(),
+                "task_name": $('#task_name').val(),
                 "time": $('#daterangepicker_demo2').val(),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
