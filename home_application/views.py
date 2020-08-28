@@ -195,7 +195,7 @@ def get_task_records(request):
     # 执行记录
     task_records = ScriptExecuteRecord.objects.all()
     record_info = {
-        "items": [{"service_name": record.service_name, "username": record.username, "task_id": record.task_id,
+        "items": [{"service_name": record.service_name, "username": record.username, "script_name": record.script_name,
                    "execute_time": record.execute_time,
                    "machine_num": record.machine_num,
                    "machine_ip": record.machine_ip, "state": record.state, "params": record.params,
