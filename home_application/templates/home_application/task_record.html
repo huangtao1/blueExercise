@@ -105,8 +105,8 @@
                 <div class="col-sm-9">
                     <select name="" id="" class="form-control bk-valign-top">
                         <option></option>
-                        {% for task_record in task_records %}
-                            <option value="{{ task_record.script_id }}">{{ task_record.script_name }}</option>
+                        {% for task in tasks %}
+                            <option value="{{ task.id }}">{{ task.name }}</option>
                         {% endfor %}
                     </select>
                 </div>

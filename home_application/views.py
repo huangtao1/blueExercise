@@ -58,7 +58,8 @@ def task_record(request):
     users = User.objects.all()
     # 执行记录
     task_records = ScriptExecuteRecord.objects.all()
-    data = {'services': services, 'users': users, 'task_records': task_records}
+    tasks = ScriptTemplates.objects.all()
+    data = {'services': services, 'users': users, 'task_records': task_records,'tasks':tasks}
     return render(request, 'home_application/task_record.html', data)
 
 
