@@ -121,6 +121,7 @@ def exec_script(request):
         # 获取脚本id
         script_id = request.POST.get('script_id')
         script = ScriptTemplates.objects.get(id=script_id)
+        script_name = script.name
         # 加密content
         script_content = str(base64.b64encode(script.content.encode('utf-8')), 'utf-8')
         # 获取ip
@@ -171,7 +172,7 @@ def exec_script(request):
         new_record_info = {"service_name": service_name, "username": username, "task_id": task_id,
                            "execute_time": execute_time,
                            "machine_num": machine_num,
-                           "machine_ip": machine_ip, "params": params, "script_id": script_id}
+                           "machine_ip": machine_ip, "params": params, "script_id": script_id,"script_name":script_name}
         if task_result.get('result', False):
             async_status(client=client, data=new_record_info, service_id=service_id)
 
