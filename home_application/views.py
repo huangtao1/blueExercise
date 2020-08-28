@@ -171,7 +171,7 @@ def exec_script(request):
         new_record_info = {"service_name": service_name, "username": username, "task_id": task_id,
                            "execute_time": execute_time,
                            "machine_num": machine_num,
-                           "machine_ip": machine_ip, "params": params}
+                           "machine_ip": machine_ip, "params": params, "script_id": script_id}
         if task_result.get('result', False):
             async_status(client=client, data=new_record_info, service_id=service_id)
 

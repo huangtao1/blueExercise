@@ -15,6 +15,7 @@ class ScriptExecuteRecord(models.Model):
     service_name = models.CharField(max_length=100, verbose_name="业务名称")
     username = models.CharField(max_length=50, verbose_name="执行用户名")
     task_id = models.CharField(max_length=100, verbose_name="执行任务的id")
+    script_id = models.CharField(max_length=100, verbose_name="执行脚本的id")
     create_time = models.DateTimeField(verbose_name="任务下发时间")
     execute_time = models.DateTimeField(verbose_name="开始执行的时间")
     machine_num = models.IntegerField(verbose_name="执行的ip数")
