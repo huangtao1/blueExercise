@@ -177,19 +177,20 @@
         },
         autoApply: true
     });
+
+    function renderTpl(str, cfg) {
+        var re = /(#(.+?)#)/g;
+
+        return str.replace(re, function () {
+            var val = cfg[arguments[2]] + '';
+            if (typeof val == 'undefined') {
+                val = '';
+            }
+            return val;
+        });
+    }
+
     $(function () {
-        function renderTpl(str, cfg) {
-            var re = /(#(.+?)#)/g;
-
-            return str.replace(re, function () {
-                var val = cfg[arguments[2]] + '';
-                if (typeof val == 'undefined') {
-                    val = '';
-                }
-                return val;
-            });
-        }
-
         // 异步请求后台数据
         $.ajax({
             url: '{{ SITE_URL }}task-record-history/',
