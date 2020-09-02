@@ -216,8 +216,8 @@ def query_task_records(request):
     start_time = datetime.strftime(starttime, '%Y-%m-%d %H:%M:%S')
     end_time = datetime.strftime(endtime, '%Y-%m-%d %H:%M:%S')
     task_records = ScriptExecuteRecord.objects.all()
-    task_records = task_records.filter(service_name=biz_name).filter(username=username).filter(script_name=script_name)
-    task_records = task_records.filter(create_time__range=(start_time, end_time))
+    #task_records = task_records.filter(service_name=biz_name).filter(username=username).filter(script_name=script_name)
+    #task_records = task_records.filter(create_time__range=(start_time, end_time))
     record_info = {
         "items": [{"service_name": record.service_name, "username": record.username, "script_name": record.script_name,
                    "execute_time": record.execute_time,
