@@ -211,13 +211,13 @@ def query_task_records(request):
     username = request.POST.get("username")
     script_name = request.POST.get("task_name")
     starttime, endtime = request.POST.get("time").split("-")
-    starttime = starttime.strip().replace("/", "-") + '00:00:00'
-    endtime = endtime.strip().replace("/", "-") + '23:59:59'
-    start_time = datetime.strftime(starttime, '%Y-%m-%d %H:%M:%S')
-    end_time = datetime.strftime(endtime, '%Y-%m-%d %H:%M:%S')
+    starttime = starttime.strip().replace("/", "-") + ' 00:00:00'
+    endtime = endtime.strip().replace("/", "-") + ' 23:59:59'
+    start_time = datetime.strptime(starttime, '%Y-%m-%d %H:%M:%S')
+    end_time = datetime.strptime(endtime, '%Y-%m-%d %H:%M:%S')
     task_records = ScriptExecuteRecord.objects.all()
-    #task_records = task_records.filter(service_name=biz_name).filter(username=username).filter(script_name=script_name)
-    #task_records = task_records.filter(create_time__range=(start_time, end_time))
+    task_records = task_records.filter(service_name=biz_name).filter(username=username).filter(script_name=script_name)
+    task_records = task_records.filter(create_time__range=(start_time, end_time))
     record_info = {
         "items": [{"service_name": record.service_name, "username": record.username, "script_name": record.script_name,
                    "execute_time": record.execute_time,
